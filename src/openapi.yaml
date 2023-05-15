@@ -1,0 +1,277 @@
+openapi: 3.0.1
+servers:
+  - url: http://localhost:5000
+info:
+  title: Teams and employees api
+  version: 1.0.0
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            data:
+              type: array
+              items:
+                type: object
+          required:
+            - name
+            - message
+      required:
+        - error
+    Team:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+        - id
+        - name
+    Teams:
+      type: array
+      items:
+        $ref: "#/components/schemas/Team"
+    NewTeam:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+      required:
+        - name
+    PatchTeam:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 100
+    Employee:
+      type: object
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+      required:
+        - id
+        - firstName
+        - lastName
+    Employees:
+      type: array
+      items:
+        $ref: "#/components/schemas/Employee"
+    NewEmployee:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        firstDayAtWork:
+          type: string
+          format: date
+        role:
+          type: string
+          enum:
+            - role1
+            - role2
+            - role3
+      required:
+        - firstName
+        - lastName
+        - firstDayAtWork
+        - role
+    PatchEmployee:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        firstDayAtWork:
+          type: string
+          format: date
+  responses:
+    error:
+      description: Default error response with error object
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    singleTeam:
+      description: single team
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Team"
+    singleEmployee:
+      description: single employee
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Employee"
+paths:
+  /teams/{id}:
+    patch:
+      parameters:
+        - in: path
+          required: true
+          name: id
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchTeam"
+      responses:
+        "200":
+          $ref: "#/components/responses/singleTeam"
+        default:
+          $ref: "#/components/responses/error"
+    delete:
+      parameters:
+        - in: path
+          required: true
+          name: id
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Team removed
+        default:
+          $ref: "#/components/responses/error"
+    get:
+      parameters:
+        - in: path
+          required: true
+          name: id
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          $ref: "#/components/responses/singleTeam"
+        default:
+          $ref: "#/components/responses/error"
+  /teams:
+    get:
+      parameters:
+        - in: "query"
+          required: false
+          name: limit
+          schema:
+            type: integer
+            default: 100
+            minimum: 1
+            maximum: 1000
+      responses:
+        "200":
+          description: List of teams
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Teams"
+        default:
+          $ref: "#/components/responses/error"
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewTeam"
+      responses:
+        "201":
+          $ref: "#/components/responses/singleTeam"
+        default:
+          $ref: "#/components/responses/error"
+  /employees/{id}:
+    patch:
+      parameters:
+        - in: path
+          required: true
+          name: id
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchEmployee"
+      responses:
+        "200":
+          $ref: "#/components/responses/singleEmployee"
+        default:
+          $ref: "#/components/responses/error"
+    delete:
+      parameters:
+        - in: path
+          required: true
+          name: id
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Team removed
+        default:
+          $ref: "#/components/responses/error"
+    get:
+      parameters:
+        - in: path
+          required: true
+          name: id
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          $ref: "#/components/responses/singleEmployee"
+        default:
+          $ref: "#/components/responses/error"
+  /employees:
+    get:
+      parameters:
+        - in: "query"
+          required: false
+          name: limit
+          schema:
+            type: integer
+            default: 100
+            minimum: 1
+            maximum: 1000
+      responses:
+        "200":
+          description: List of teams
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Employees"
+        default:
+          $ref: "#/components/responses/error"
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewEmployee"
+      responses:
+        "201":
+          $ref: "#/components/responses/singleEmployee"
+        default:
+          $ref: "#/components/responses/error"

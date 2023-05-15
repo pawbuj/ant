@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  api:
+    container_name: api
+    build: .
+    ports:
+      - ${PORT}:${PORT}
+    depends_on:
+      - db
+    volumes:
+    - .:/usr/src/app
+    command: npm run dev
+    env_file: 
+      - .env
+  db:
+    container_name: db
+    image: postgres
+    ports:
+      - '5433:${DB_PORT}'
+    volumes:
+      - dataa:/data/db
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+volumes: 
+ dataa: {} 
+ node_modules:
+ dist:
